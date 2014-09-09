@@ -1,0 +1,5 @@
+E:\git\AICup\csharp-cgdk\bin\Debug\csharp-cgdk.exe
+E:\git\AICup\csharp-cgdk\bin\Debug\csharp-cgdk.pdb
+E:\git\AICup\csharp-cgdk\obj\Debug\csharp-cgdk.csprojResolveAssemblyReference.cache
+E:\git\AICup\csharp-cgdk\obj\Debug\csharp-cgdk.exe
+E:\git\AICup\csharp-cgdk\obj\Debug\csharp-cgdk.pdb
