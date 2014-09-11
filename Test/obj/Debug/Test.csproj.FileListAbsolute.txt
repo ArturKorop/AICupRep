@@ -1,0 +1,7 @@
+D:\Projects\Git\AICupRep\Test\bin\Debug\Test.dll
+D:\Projects\Git\AICupRep\Test\bin\Debug\Test.pdb
+D:\Projects\Git\AICupRep\Test\bin\Debug\csharp-cgdk.exe
+D:\Projects\Git\AICupRep\Test\bin\Debug\csharp-cgdk.pdb
+D:\Projects\Git\AICupRep\Test\obj\Debug\Test.csprojResolveAssemblyReference.cache
+D:\Projects\Git\AICupRep\Test\obj\Debug\Test.dll
+D:\Projects\Git\AICupRep\Test\obj\Debug\Test.pdb
