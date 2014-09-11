@@ -14,7 +14,7 @@ namespace Test
             var self = new Hockeyist(1, 1, 1, 10, 30, 100, 100, 0, 0, 0, 0, true, HockeyistType.Versatile, 100, 100, 100, 100, 100, HockeyistState.Active, 100, 30, 30, 10, null, null);
             var angle = self.GetAngleTo(0, 100);
             Assert.AreEqual(angle, Math.PI);
-            Assert.AreEqual(Actions.CalculateOptimalSpeed(1, angle), 0.2);
+            Assert.AreEqual(Actions.CalculateOptimalSpeed(1, angle), -1);
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace Test
             var self = new Hockeyist(1, 1, 1, 10, 30, 100, 100, 0, 0, 0, 0, true, HockeyistType.Versatile, 100, 100, 100, 100, 100, HockeyistState.Active, 100, 30, 30, 10, null, null);
             var angle = self.GetAngleTo(50, 50);
             Assert.AreEqual(angle, -Math.PI * 3 / 4);
-            Assert.AreEqual(Actions.CalculateOptimalSpeed(1, angle), 0.2);
+            Assert.AreEqual(Actions.CalculateOptimalSpeed(1, angle), -1);
         }
 
     }

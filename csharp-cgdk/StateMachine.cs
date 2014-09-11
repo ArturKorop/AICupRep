@@ -63,6 +63,11 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                                                 actions.HavePuck_SelfHavePuck_TurnToStrike();
                                             }
                                             break;
+                                        case SelfHavePuckStates.MoveToBase:
+                                            {
+                                                actions.HavePuck_GoToBase();
+                                            }
+                                            break;
                                     }
                                 }
                                 break;
@@ -168,7 +173,8 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         MoveToBestStrikePosition,
         TurnToStrike,
         Strike,
-        Swing
+        Swing,
+        MoveToBase
     }
 
     public enum SelfNearestToOpponentWithPuckStates
@@ -255,6 +261,14 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             move.Turn = self.GetAngleTo(world.Puck);
             move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
             move.Action = ActionType.Strike;
+        }
+
+        public void HavePuck_GoToBase()
+        {
+            var basePoint = Manager.DefenderPosition;
+
+            move.Turn = self.GetAngleTo(basePoint.X, basePoint.Y);
+            move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
         }
 
         public static Point GetBestPositionToAttack(Hockeyist self)
