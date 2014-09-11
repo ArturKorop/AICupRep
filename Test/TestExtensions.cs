@@ -50,5 +50,15 @@ namespace Test
 
             Assert.AreEqual(from.DistanceToSegment(a, b), 50);
         }
+
+        [TestMethod]
+        public void DistanceTo_5()
+        {
+            var a = new Point(100, 100);
+            var b = new Point(200, 100);
+            var from = new Point(50, 150);
+
+            Assert.AreEqual(from.DistanceToSegment(a, b), double.MaxValue);
+        }
     }
 }

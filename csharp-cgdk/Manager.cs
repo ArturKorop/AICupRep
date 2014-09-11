@@ -299,6 +299,11 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public static double DistanceToSegment(this Point from, Point a, Point b)
         {
+            if(from.X > Math.Max(a.X,b.X) || from.X < Math.Min(a.X, b.X) || from.Y > Math.Max(a.Y,b.Y) || from.Y < Math.Min(a.Y, b.Y))
+            {
+                return double.MaxValue;
+            }
+
             var distance = Math.Abs((b.X - a.X) * (a.Y - from.Y) - (a.X - from.X) * (b.Y - a.Y)) / b.DistanceTo(a);
 
             return distance;
@@ -312,6 +317,11 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public static double DistanceToSegment(this Hockeyist hockeist, Point a, Point b)
         {
             return hockeist.ToPoint().DistanceToSegment(a, b);
+        }
+
+        public static double GetDistanceTo(this Hockeyist hockeyist, Point point)
+        {
+            return hockeyist.GetDistanceTo(point.X, point.Y);
         }
     }
 

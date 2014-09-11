@@ -301,13 +301,22 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
             //return Manager.BestTopStrikePosition;
 
-            if(world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestTopStrikePosition.X, Manager.BestTopStrikePosition.Y)).Min() >
-                world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestBottomStrikePosition.X, Manager.BestBottomStrikePosition.Y)).Min())
+            var minDistOpponentToTop = world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestTopStrikePosition)).Min();
+            var minDistOpponentToBottom = world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestBottomStrikePosition)).Min();
+            var selfDistToTop = self.GetDistanceTo(Manager.BestTopStrikePosition);
+            var selfDistToBottom = self.GetDistanceTo(Manager.BestBottomStrikePosition);
+            if(Math.Min(selfDistToTop, selfDistToBottom) > 300)
             {
-                return Manager.BestBottomStrikePosition;
+                return minDistOpponentToBottom > minDistOpponentToTop 
+                    ? Manager.BestBottomStrikePosition 
+                    : Manager.BestTopStrikePosition;
             }
-
-            return Manager.BestTopStrikePosition;
+            else
+            {
+                return selfDistToBottom > selfDistToTop 
+                    ? Manager.BestTopStrikePosition
+                    : Manager.BestBottomStrikePosition;
+            }
         }
 
         public static Point GetBestHitPosition(Hockeyist self)
