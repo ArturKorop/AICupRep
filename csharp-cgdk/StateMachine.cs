@@ -124,8 +124,9 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                     }
                     break;
             }
-
 #if Debug
+            
+
             if(world.Tick == world.TickCount)
             {
                 Console.WriteLine("{0}:{1}", world.GetMyPlayer().GoalCount, world.GetOpponentPlayer().GoalCount);
@@ -181,6 +182,8 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public const double StrikeAngle = 1.0D * Math.PI / 180.0D;
 
         public const double DangerDistanceToOpponent = 70;
+
+        public const double DistanceToStrike = 280;
     }
 
     public class Actions
@@ -274,7 +277,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
             if(modTurn > Math.PI / 2)
             {
-                return 0;
+                return 0.2;
             }
 
             if(modTurn == 0)

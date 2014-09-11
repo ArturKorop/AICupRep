@@ -7,8 +7,6 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 {
     public sealed class MyStrategy : IStrategy
     {
-        private const double StrikeAngle = 1.0D * Math.PI / 180.0D;
-
         public void Move(Hockeyist self, World world, Game game, Move move)
         {
             Manager.SetRoles(world, game);

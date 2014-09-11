@@ -124,11 +124,20 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         {
             var opponentWithPuck = world.HockeyistWithPuck();
             var distanceToOpponent = self.GetDistanceTo(opponentWithPuck);
+            var distanceToPuck = self.GetDistanceTo(world.Puck);
             var angleToOpponent = self.GetAngleTo(opponentWithPuck);
+            var angleToPuck = self.GetAngleTo(world.Puck);
 
             if (distanceToOpponent <= game.StickLength && Math.Abs(angleToOpponent) <= game.StickSector / 2)
             {
-                return SelfNearestToOpponentWithPuckStates.CanStrikeOpponent;
+                if(distanceToPuck <= game.StickLength && Math.Abs(angleToPuck) <= game.StickSector / 2)
+                {
+                    return SelfNearestToOpponentWithPuckStates.CannotStrikeOpponent;
+                }
+                else
+                {
+                    return SelfNearestToOpponentWithPuckStates.CanStrikeOpponent;
+                }
             }
             else
             {
@@ -154,7 +163,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                 var bestHitPosition = Actions.GetBestHitPosition(self);
                 if (Math.Abs(self.GetAngleTo(bestHitPosition.X, bestHitPosition.Y)) < Constants.StrikeAngle)
                 {
-                    if(self.GetDistanceTo(self.NearestOpponent(world)) > Constants.DangerDistanceToOpponent)
+                    if(self.GetDistanceTo(self.NearestOpponent(world)) > Constants.DangerDistanceToOpponent && self.GetDistanceTo(bestHitPosition.X, bestHitPosition.Y) > Constants.DistanceToStrike)
                     {
                         return SelfHavePuckStates.Swing;
                     }
