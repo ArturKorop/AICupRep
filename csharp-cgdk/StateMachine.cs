@@ -280,7 +280,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                 return -1;
             }
 
-            if(modTurn == 0)
+            if(modTurn == 0 || modTurn < Math.PI / 8)
             {
                 return speed;
             }
