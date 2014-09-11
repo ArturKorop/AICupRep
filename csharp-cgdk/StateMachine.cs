@@ -242,7 +242,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public void HavePuck_SelfHavePuck_MoveToBestStrikePosition()
         {
-            var bestStrikePosition = GetBestPositionToAttack(self);
+            var bestStrikePosition = GetBestPositionToAttack(self, world);
 
             move.Turn = self.GetAngleTo(bestStrikePosition.X, bestStrikePosition.Y);
             move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
@@ -271,16 +271,6 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
         }
 
-        public static Point GetBestPositionToAttack(Hockeyist self)
-        {
-            if (self.GetDistanceTo(Manager.BestTopStrikePosition.X, Manager.BestTopStrikePosition.Y) > self.GetDistanceTo(Manager.BestBottomStrikePosition.X, Manager.BestBottomStrikePosition.Y))
-            {
-                return Manager.BestBottomStrikePosition;
-            }
-
-            return Manager.BestTopStrikePosition;
-        }
-
         public static double CalculateOptimalSpeed(double speed, double turn)
         {
             var modTurn = Math.Abs(turn);
@@ -302,9 +292,31 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             return speed * (1 - modTurn / Math.PI);
         }
 
+        public static Point GetBestPositionToAttack(Hockeyist self, World world)
+        {
+            //if (self.GetDistanceTo(Manager.BestTopStrikePosition.X, Manager.BestTopStrikePosition.Y) > self.GetDistanceTo(Manager.BestBottomStrikePosition.X, Manager.BestBottomStrikePosition.Y))
+            //{
+            //    return Manager.BestBottomStrikePosition;
+            //}
+
+            //return Manager.BestTopStrikePosition;
+
+            if(world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestTopStrikePosition.X, Manager.BestTopStrikePosition.Y)).Min() >
+                world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestBottomStrikePosition.X, Manager.BestBottomStrikePosition.Y)).Min())
+            {
+                return Manager.BestBottomStrikePosition;
+            }
+
+            return Manager.BestTopStrikePosition;
+        }
+
         public static Point GetBestHitPosition(Hockeyist self)
         {
-            return GetBestPositionToAttack(self) == Manager.BestTopStrikePosition ? Manager.BestBottomHitPosition : Manager.BestTopHitPosition;
+            //return GetBestPositionToAttack(self) == Manager.BestTopStrikePosition ? Manager.BestBottomHitPosition : Manager.BestTopHitPosition;
+            return self.GetDistanceTo(Manager.BestTopHitPosition.X, Manager.BestTopHitPosition.Y) >
+                self.GetDistanceTo(Manager.BestBottomHitPosition.X, Manager.BestBottomHitPosition.Y)
+                ? Manager.BestTopHitPosition
+                : Manager.BestBottomHitPosition;
         }
     }
 }

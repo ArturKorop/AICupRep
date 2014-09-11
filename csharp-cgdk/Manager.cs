@@ -111,6 +111,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public static FreePuckStates FreePuckState(this World world, Hockeyist self)
         {
+            Manager.RetreatList[self.Id] = null;
             var selfDistanceToPuck = self.GetDistanceTo(world.Puck);
 
             return world.Teammates(self).Max(x => x.GetDistanceTo(world.Puck)) > selfDistanceToPuck
@@ -120,6 +121,8 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public static OpponentHavePuckStates OpponentHavePuckState(this World world, Hockeyist self)
         {
+            Manager.RetreatList[self.Id] = null;
+
             var opponentWithPuck = world.Hockeyists.Single(x => x.Id == world.Puck.OwnerHockeyistId);
             var selfDistanceToOpponentWithPuck = self.GetDistanceTo(opponentWithPuck);
 
@@ -176,7 +179,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             }
 
             var distanceToNet = self.GetDistanceTo(world.OpponentNetCenter().X, world.OpponentNetCenter().Y);
-            var bestPosToAttack = Actions.GetBestPositionToAttack(self);
+            var bestPosToAttack = Actions.GetBestPositionToAttack(self, world);
             var distanceToBestStrikePosition = self.GetDistanceTo(bestPosToAttack.X, bestPosToAttack.Y);
             var distanceBetweenNetAndBestStrikePosition = bestPosToAttack.DistanceTo(world.OpponentNetCenter());
 
@@ -233,7 +236,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         }
 
         /// <summary>
-        /// Return all team in the rink without goalie and resting teammates
+        /// Return all my team in the rink without goalie and resting teammates
         /// </summary>
         /// <param name="world">The world</param>
         /// <returns>The teammates.</returns>
@@ -242,6 +245,11 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             return world.Hockeyists.Where(x => x.IsTeammate && x.Type != HockeyistType.Goalie && x.State != HockeyistState.Resting);
         }
 
+        // <summary>
+        /// Return all opponent team in the rink without goalie and resting teammates
+        /// </summary>
+        /// <param name="world">The world</param>
+        /// <returns>The teammates.</returns>
         public static IEnumerable<Hockeyist> Opponents(this World world)
         {
             return world.Hockeyists.Where(x => !x.IsTeammate && x.Type != HockeyistType.Goalie && x.State != HockeyistState.Resting);
