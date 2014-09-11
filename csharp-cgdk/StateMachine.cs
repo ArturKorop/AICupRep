@@ -277,7 +277,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
             if(modTurn > Math.PI / 2)
             {
-                return 0.2;
+                return -1;
             }
 
             if(modTurn == 0)
