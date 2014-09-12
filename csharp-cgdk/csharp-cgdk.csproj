@@ -69,6 +69,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttackStrategy.cs" />
+    <Compile Include="CurrentSituation.cs" />
+    <Compile Include="DefenceStrategy.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Model\ActionType.cs" />
     <Compile Include="IStrategy.cs" />
@@ -87,6 +90,7 @@
     <Compile Include="Model\Unit.cs" />
     <Compile Include="Model\World.cs" />
     <Compile Include="StateMachine.cs" />
+    <Compile Include="Support.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">

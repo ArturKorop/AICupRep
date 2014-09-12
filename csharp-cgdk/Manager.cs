@@ -8,228 +8,115 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 {
     public static class Manager
     {
-        public static long DefenderId { get; set; }
-
-        public static long ForwardId { get; set; }
-
         public static Point BestTopStrikePosition { get; set; }
-
-        public static Point BestTopHitPosition { get; set; }
 
         public static Point BestBottomStrikePosition { get; set; }
 
-        public static Point BestBottomHitPosition { get; set; }
+        public static Point BestTopPrepareToStrikePosition { get; set; }
+
+        public static Point BestBottomPrepareToStrikePosition { get; set; }
+
+        public static Point RetreatPosition { get; set; }
 
         public static Point DefenderPosition { get; set; }
 
-        public static Dictionary<long, SelfHavePuckStates?> RetreatList;
+        public static Point FieldCenter { get; set; }
 
-        private static bool isSetRoles;
+        public static Point MyNetCenter { get; set; }
 
-        public static void SetRoles(World world, Game game)
+        public static Point OpponentNetCenter { get; set; }
+
+        public static double MyThirdX { get; set; }
+
+        public static double OpponentThirdX { get; set; }
+
+        public static double TopThirdY { get; set; }
+
+        public static double BottomThirdY { get; set; }
+
+        private static bool isInit;
+
+        public static void Init(World world, Game game)
         {
-            if (!isSetRoles)
+            if (!isInit)
             {
-                var teammates = world.Hockeyists.Where(x => x.IsTeammate && x.Type != HockeyistType.Goalie);
-                var orderedTeammates = teammates.OrderByDescending(x => x.GetDistanceTo(world.Puck)).ToArray();
-                DefenderId = orderedTeammates[0].Id;
-                ForwardId = orderedTeammates[1].Id;
-
+                CalculateNetCentres(world, game);
                 CalculateBestStrikePosition(world, game);
 
-                RetreatList = new Dictionary<long, SelfHavePuckStates?>();
-                foreach (var hockeyiest in world.Team())
-                {
-                    RetreatList.Add(hockeyiest.Id, null);
-                }
-
-                isSetRoles = true;
+                isInit = true;
             }
         }
 
         private static void CalculateBestStrikePosition(World world, Game game)
         {
             var opponent = world.GetOpponentPlayer();
-            var rinkBorderLength = ((game.RinkBottom - game.RinkTop) - game.GoalNetHeight) / 2;
-            var bestTopY = game.RinkTop + rinkBorderLength * 2 / 3;
-            var bestBottomY = game.RinkBottom - rinkBorderLength * 2 / 3;
 
-            var rinkLength = game.RinkRight - game.RinkLeft;
-            var bestAttackerRinkLength = rinkLength / 2 * 0.8;
+            var bestTopY = game.RinkTop + Constants.RinkHeightToBestStrikePosition;
+            var bestBottomY = game.RinkBottom - Constants.RinkHeightToBestStrikePosition;
+
+            var rinkWidth = game.RinkRight - game.RinkLeft;
+            var bestAttackerRinkLength = rinkWidth / 2 * 0.8;
             var bestX = 0.0;
-            var bestHitX = 0.0;
-            var defenderX = 0.0;
-            if(opponent.NetLeft > 500) 
+            var retreatX = 0.0;
+            if(opponent.NetLeft > Manager.FieldCenter.X) 
             {
                 bestX = game.RinkRight - bestAttackerRinkLength;
-                bestHitX = game.RinkRight;
-                defenderX = game.RinkLeft + 100;
+                retreatX = game.RinkLeft + Constants.BestRetreatDistance;
             }
             else
             {
                 bestX = game.RinkLeft + bestAttackerRinkLength;
-                bestHitX = game.RinkLeft;
-                defenderX = game.RinkRight - 100;
+                retreatX = game.RinkRight - Constants.BestRetreatDistance;
             }
             
             BestTopStrikePosition = new Point(bestX, bestTopY);
-            BestTopHitPosition = new Point(bestHitX, opponent.NetTop + 20);
 
             BestBottomStrikePosition = new Point(bestX, bestBottomY);
-            BestBottomHitPosition = new Point(bestHitX, opponent.NetBottom - 20);
 
-            DefenderPosition = new Point(defenderX, (game.RinkBottom - game.RinkTop) / 2 + game.RinkTop);
+            RetreatPosition = new Point(retreatX, Manager.FieldCenter.Y);
 
+            DefenderPosition = new Point(world.GetMyPlayer().NetFront, Manager.MyNetCenter.Y);
+        }
+
+        private static void CalculateNetCentres(World world, Game game)
+        {
+            var opponent = world.GetOpponentPlayer();
+            var me = world.GetMyPlayer();
+
+            OpponentNetCenter = new Point(opponent.NetFront, (opponent.NetTop + opponent.NetBottom) / 2);
+            MyNetCenter = new Point(me.NetFront, (me.NetTop + me.NetBottom) / 2);
+            FieldCenter = new Point(world.Puck.X, world.Puck.Y);
+
+            var fieldWidth = Math.Abs(me.NetFront - opponent.NetFront);
+            var fieldHeight = game.RinkBottom - game.RinkTop;
+
+            var thirdFieldWidth = fieldWidth / 3;
+            var thirdFieldHeight = fieldHeight / 3;
+
+            MyThirdX = MyNetCenter.X > FieldCenter.X
+                ? MyNetCenter.X - thirdFieldWidth
+                : MyNetCenter.X + thirdFieldWidth;
+
+            OpponentThirdX = OpponentNetCenter.X > FieldCenter.X
+                ? OpponentNetCenter.X - thirdFieldWidth
+                : OpponentNetCenter.X + thirdFieldWidth;
+
+            TopThirdY = game.RinkTop + thirdFieldHeight;
+            BottomThirdY = game.RinkBottom - thirdFieldHeight;
+
+            BestTopPrepareToStrikePosition = new Point(FieldCenter.X, TopThirdY);
+            BestBottomPrepareToStrikePosition = new Point(FieldCenter.X, BottomThirdY);
         }
     }
 
-    public static class Extensions
+    public static class WorldExtensions
     {
-        public static bool IsDeffender(this Hockeyist hockeyist)
-        {
-            return hockeyist.Id == Manager.DefenderId;
-        }
-
-        public static bool IsForward(this Hockeyist hockeyist)
-        {
-            return hockeyist.Id == Manager.ForwardId;
-        }
-
-        public static PuckStates PuckState(this World world, Hockeyist self)
-        {
-            return 
-                self.State == HockeyistState.Swinging ? PuckStates.Swing :
-                world.Puck.OwnerPlayerId == world.GetMyPlayer().Id ? PuckStates.HavePuck :
-                world.Puck.OwnerPlayerId == world.GetOpponentPlayer().Id ? PuckStates.OpponentHavePuck :
-                PuckStates.FreePuck;
-        }
-
-        public static HavePuckStates HavePuckState(this World world, Hockeyist self)
-        {
-            return world.Puck.OwnerHockeyistId == self.Id ? HavePuckStates.SelfHavePuck : HavePuckStates.TeammateHavePuck;
-        }
-
-        public static FreePuckStates FreePuckState(this World world, Hockeyist self)
-        {
-            Manager.RetreatList[self.Id] = null;
-            var selfDistanceToPuck = self.GetDistanceTo(world.Puck);
-
-            return world.Teammates(self).Max(x => x.GetDistanceTo(world.Puck)) > selfDistanceToPuck
-                ? FreePuckStates.TeammateNearestToPuck
-                : FreePuckStates.SelfNearestToPuck;
-        }
-
-        public static OpponentHavePuckStates OpponentHavePuckState(this World world, Hockeyist self)
-        {
-            Manager.RetreatList[self.Id] = null;
-
-            var opponentWithPuck = world.Hockeyists.Single(x => x.Id == world.Puck.OwnerHockeyistId);
-            var selfDistanceToOpponentWithPuck = self.GetDistanceTo(opponentWithPuck);
-
-            return world.Teammates(self).Max(x => x.GetDistanceTo(opponentWithPuck)) > selfDistanceToOpponentWithPuck
-                ? OpponentHavePuckStates.TeammatesNearestToOpponentWithPuck
-                : OpponentHavePuckStates.SelfNearestToOpponentWithPuck;
-        }
-
-        public static SelfNearestToOpponentWithPuckStates SelfNearestToOpponentWithPuckState(this World world, Hockeyist self, Game game)
-        {
-            var opponentWithPuck = world.HockeyistWithPuck();
-            var distanceToOpponent = self.GetDistanceTo(opponentWithPuck);
-            var distanceToPuck = self.GetDistanceTo(world.Puck);
-            var angleToOpponent = self.GetAngleTo(opponentWithPuck);
-            var angleToPuck = self.GetAngleTo(world.Puck);
-
-            if (distanceToOpponent <= game.StickLength && Math.Abs(angleToOpponent) <= game.StickSector / 2)
-            {
-                if(distanceToPuck <= game.StickLength && Math.Abs(angleToPuck) <= game.StickSector / 2)
-                {
-                    return SelfNearestToOpponentWithPuckStates.CannotStrikeOpponent;
-                }
-                else
-                {
-                    return SelfNearestToOpponentWithPuckStates.CanStrikeOpponent;
-                }
-            }
-            else
-            {
-                return SelfNearestToOpponentWithPuckStates.CannotStrikeOpponent;
-            }
-
-        }
-
-        public static SelfHavePuckStates SelfHavePuckState(this World world, Hockeyist self)
-        {
-            if(self.State == HockeyistState.Swinging)
-            {
-                return SelfHavePuckStates.Strike;
-            }
-
-            var isRetreat = Manager.RetreatList[self.Id];
-            if(isRetreat != null)
-            {
-                var basePoint = Manager.DefenderPosition;
-                if (self.GetDistanceTo(basePoint.X, basePoint.Y) > 150)
-                {
-                    return SelfHavePuckStates.MoveToBase;
-                }
-                else
-                {
-                    Manager.RetreatList[self.Id] = null;
-                }
-            }
-
-            var distanceToNet = self.GetDistanceTo(world.OpponentNetCenter().X, world.OpponentNetCenter().Y);
-            var bestPosToAttack = Actions.GetBestPositionToAttack(self, world);
-            var distanceToBestStrikePosition = self.GetDistanceTo(bestPosToAttack.X, bestPosToAttack.Y);
-            var distanceBetweenNetAndBestStrikePosition = bestPosToAttack.DistanceTo(world.OpponentNetCenter());
-
-            if (distanceToNet < distanceBetweenNetAndBestStrikePosition || distanceToBestStrikePosition < 50 || distanceToNet < distanceToBestStrikePosition)
-            {
-                var bestHitPosition = Actions.GetBestHitPosition(self);
-                var nearestOpponentDistanceToStrikeVector = world.Hockeyists.Where(x => !x.IsTeammate).Select(x => x.DistanceToSegment(self.ToPoint(), bestHitPosition)).Min();
-                if (nearestOpponentDistanceToStrikeVector < world.Puck.Radius)
-                {
-                    Manager.RetreatList[self.Id] = SelfHavePuckStates.MoveToBase;
-
-                    return SelfHavePuckStates.MoveToBase;
-                }
-                else
-                {
-                    if (Math.Abs(self.GetAngleTo(bestHitPosition.X, bestHitPosition.Y)) < Constants.StrikeAngle)
-                    {
-                        if (self.GetDistanceTo(self.NearestOpponent(world)) > Constants.DangerDistanceToOpponent && self.GetDistanceTo(bestHitPosition.X, bestHitPosition.Y) > Constants.DistanceToStrike)
-                        {
-                            return SelfHavePuckStates.Swing;
-                        }
-                        else
-                        {
-                            return SelfHavePuckStates.Strike;
-                        }
-                    }
-                    else
-                    {
-                        return SelfHavePuckStates.TurnToStrike;
-                    }
-                }
-            }
-            else
-            {
-                return SelfHavePuckStates.MoveToBestStrikePosition;
-            }
-        }
-
-        public static Hockeyist HockeyistWithPuck(this World world)
-        {
-            return world.Hockeyists.SingleOrDefault(x => x.Id == world.Puck.OwnerHockeyistId);
-        }
-
-        public static Point OpponentNetCenter(this World world)
-        {
-            var opponent = world.GetOpponentPlayer();
-
-            return new Point((opponent.NetLeft + opponent.NetRight) / 2, (opponent.NetTop + opponent.NetBottom) / 2);
-        }
-
+        /// <summary>
+        /// Return all other teammates without goalie, resting teammates and self.
+        /// </summary>
+        /// <param name="world">The world.</param>
+        /// <param name="self">The self.</param>
+        /// <returns>The teammates</returns>
         public static IEnumerable<Hockeyist> Teammates(this World world, Hockeyist self)
         {
             return world.Hockeyists.Where(x => x.IsTeammate && x.Id != self.Id && x.Type != HockeyistType.Goalie && x.State != HockeyistState.Resting);
@@ -240,58 +127,34 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         /// </summary>
         /// <param name="world">The world</param>
         /// <returns>The teammates.</returns>
-        public static IEnumerable<Hockeyist> Team(this World world)
+        public static IEnumerable<Hockeyist> MyTeam(this World world)
         {
             return world.Hockeyists.Where(x => x.IsTeammate && x.Type != HockeyistType.Goalie && x.State != HockeyistState.Resting);
         }
 
-        // <summary>
+        /// <summary>
         /// Return all opponent team in the rink without goalie and resting teammates
         /// </summary>
         /// <param name="world">The world</param>
         /// <returns>The teammates.</returns>
-        public static IEnumerable<Hockeyist> Opponents(this World world)
+        public static IEnumerable<Hockeyist> OpponentTeam(this World world)
         {
             return world.Hockeyists.Where(x => !x.IsTeammate && x.Type != HockeyistType.Goalie && x.State != HockeyistState.Resting);
         }
 
-        public static Hockeyist NearestOpponent(this Hockeyist self, World world)
+        public static Hockeyist OpponentGoalie(this World world)
         {
-            Hockeyist nearestOpponent = null;
-            double nearestOpponentRange = 0.0D;
-
-            foreach (Hockeyist hockeyist in world.Opponents())
-            {
-                double opponentRange = self.GetDistanceTo(hockeyist);
-
-                if (nearestOpponent == null || opponentRange < nearestOpponentRange)
-                {
-                    nearestOpponent = hockeyist;
-                    nearestOpponentRange = opponentRange;
-                }
-            }
-
-            return nearestOpponent ?? world.Opponents().First();
+            return world.Hockeyists.SingleOrDefault(x => !x.IsTeammate && x.Type == HockeyistType.Goalie);
         }
 
-        public static Hockeyist NearestTeammateToPuck(this World world)
+        public static Hockeyist MyGoalie(this World world)
         {
-            Hockeyist nearestTeammateToPuck = null;
-            var rangeToPuck = double.MaxValue;
-
-            foreach (var hockeyist in world.Team())
-            {
-                var distance = hockeyist.GetDistanceTo(world.Puck);
-                if(nearestTeammateToPuck == null || distance < rangeToPuck)
-                {
-                    nearestTeammateToPuck = hockeyist;
-                    rangeToPuck = distance;
-                }
-            }
-
-            return nearestTeammateToPuck;
+            return world.Hockeyists.SingleOrDefault(x => x.IsTeammate && x.Type == HockeyistType.Goalie);
         }
+    }
 
+    public static class MathExtensions
+    {
         public static double DistanceTo(this Point from, Point to)
         {
             return Math.Sqrt(Math.Pow(from.X - to.X, 2) + Math.Pow(from.Y - to.Y, 2));
@@ -299,7 +162,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public static double DistanceToSegment(this Point from, Point a, Point b)
         {
-            if(from.X > Math.Max(a.X,b.X) || from.X < Math.Min(a.X, b.X) || from.Y > Math.Max(a.Y,b.Y) || from.Y < Math.Min(a.Y, b.Y))
+            if (from.X > Math.Max(a.X, b.X) || from.X < Math.Min(a.X, b.X) || from.Y > Math.Max(a.Y, b.Y) || from.Y < Math.Min(a.Y, b.Y))
             {
                 return double.MaxValue;
             }
@@ -309,7 +172,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             return distance;
         }
 
-        public static Point ToPoint(this Hockeyist hockeyist)
+        public static Point ToPoint(this Unit hockeyist)
         {
             return new Point(hockeyist.X, hockeyist.Y);
         }
@@ -325,16 +188,91 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         }
     }
 
-    public class Point
+    public static class Extensions
     {
-        public double X { get; set; }
-
-        public double Y { get; set; }
-
-        public Point(double x, double y)
+        public static PuckStates PuckState(this World world, Hockeyist self)
         {
-            this.X = x;
-            this.Y = y;
+            return 
+                self.State == HockeyistState.Swinging ? PuckStates.Swing :
+                world.Puck.OwnerPlayerId == world.GetMyPlayer().Id ? PuckStates.HavePuck :
+                world.Puck.OwnerPlayerId == world.GetOpponentPlayer().Id ? PuckStates.OpponentHavePuck :
+                PuckStates.FreePuck;
+        }
+
+        public static HavePuckStates HavePuckState(this World world, Hockeyist self)
+        {
+            return world.Puck.OwnerHockeyistId == self.Id ? HavePuckStates.SelfHavePuck : HavePuckStates.TeammateHavePuck;
+        }
+
+        public static Hockeyist HockeyistWithPuck(this World world)
+        {
+            return world.Hockeyists.SingleOrDefault(x => x.Id == world.Puck.OwnerHockeyistId);
+        }
+
+        public static Hockeyist NearestOpponent(this Hockeyist self, World world)
+        {
+            Hockeyist nearestOpponent = null;
+            double nearestOpponentRange = 0.0D;
+
+            foreach (Hockeyist hockeyist in world.OpponentTeam())
+            {
+                double opponentRange = self.GetDistanceTo(hockeyist);
+
+                if (nearestOpponent == null || opponentRange < nearestOpponentRange)
+                {
+                    nearestOpponent = hockeyist;
+                    nearestOpponentRange = opponentRange;
+                }
+            }
+
+            return nearestOpponent ?? world.OpponentTeam().First();
+        }
+
+        public static Hockeyist NearestTeammateToPuck(this World world)
+        {
+            Hockeyist nearestTeammateToPuck = null;
+            var rangeToPuck = double.MaxValue;
+
+            foreach (var hockeyist in world.MyTeam())
+            {
+                var distance = hockeyist.GetDistanceTo(world.Puck);
+                if(nearestTeammateToPuck == null || distance < rangeToPuck)
+                {
+                    nearestTeammateToPuck = hockeyist;
+                    rangeToPuck = distance;
+                }
+            }
+
+            return nearestTeammateToPuck;
+        }
+    }
+
+    public static class HockeyistExtensions
+    {
+        public static double ApproximateTimeToGoToTarget(this Hockeyist self, Point target, Game game)
+        {
+            var angleToTarget = self.GetAngleTo(target.X, target.Y);
+            var distanceToTarget = self.GetDistanceTo(target);
+
+            var turnTicks = angleToTarget / game.HockeyistTurnAngleFactor;
+            var distanceTicks = 0.0;
+            var a = (game.HockeyistSpeedUpFactor - game.HockeyistSpeedDownFactor);
+            if(angleToTarget < Math.PI/2)
+            {
+                var d = Math.Sqrt(Math.Pow(self.Speed(), 2) + 2 * a * distanceToTarget);
+                distanceTicks = (d - self.Speed()) / a;
+            }
+            else
+            {
+                distanceTicks = Math.Sqrt(2 * distanceToTarget / a);
+            }
+
+            return distanceTicks/2 + turnTicks;
+        }
+
+        public static double Speed(this Unit self)
+        {
+            return Math.Sqrt(Math.Pow(self.SpeedX, 2) + Math.Pow(self.SpeedY, 2));
         }
     }
 }
