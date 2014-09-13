@@ -19,6 +19,8 @@ build/
 [Bb]in/
 [Oo]bj/
 local-runner
+ServerVersion
+ServerVersion2
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
