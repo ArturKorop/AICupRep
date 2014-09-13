@@ -10,7 +10,8 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
     {
         public static void Run(World world, Move move, Hockeyist self, Game game)
         {
-            var actions = new Actions(world, game, self, move);
+            var currentSituation = new CurrentSituation(world, game, self);
+            var actions = new Actions(world, game, self, move, currentSituation);
             var puckState = world.PuckState(self);
 
             switch(puckState)
@@ -40,7 +41,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                         {
                             case HavePuckStates.SelfHavePuck:
                                 {
-                                    var selfHavePuckState = world.SelfHavePuckState(self);
+                                    var selfHavePuckState = world.SelfHavePuckState(self, currentSituation);
                                     switch(selfHavePuckState)
                                     {
                                         case SelfHavePuckStates.MoveToBestStrikePosition:
@@ -63,9 +64,9 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                                                 actions.HavePuck_SelfHavePuck_TurnToStrike();
                                             }
                                             break;
-                                        case SelfHavePuckStates.MoveToBase:
+                                        case SelfHavePuckStates.MoveToRetreatPosition:
                                             {
-                                                actions.HavePuck_GoToBase();
+                                                actions.HavePuck_GoToRetreatPosition();
                                             }
                                             break;
                                     }
@@ -174,7 +175,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         TurnToStrike,
         Strike,
         Swing,
-        MoveToBase
+        MoveToRetreatPosition
     }
 
     public enum SelfNearestToOpponentWithPuckStates
@@ -189,7 +190,11 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public const double DangerDistanceToOpponent = 70;
 
-        public const double DistanceToStrike = 280;
+        public const double DistanceToStrike = 250;
+
+        public const double DistanceFromNetBorderToBestHitTarget = 20;
+
+        public const double RetreatX = 300;
     }
 
     public class Actions
@@ -198,13 +203,15 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         private Game game;
         private Hockeyist self;
         private Move move;
+        private CurrentSituation currentSituation;
 
-        public Actions(World world, Game game, Hockeyist self, Move move)
+        public Actions(World world, Game game, Hockeyist self, Move move, CurrentSituation currentSituation)
         {
             this.world = world;
             this.game = game;
             this.self = self;
             this.move = move;
+            this.currentSituation = currentSituation;
         }
 
         public void FreePuck_SelfNearestToPuckAction()
@@ -245,12 +252,12 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             var bestStrikePosition = GetBestPositionToAttack(self, world);
 
             move.Turn = self.GetAngleTo(bestStrikePosition.X, bestStrikePosition.Y);
-            move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
+            move.SpeedUp = 1;//CalculateOptimalSpeed(1, move.Turn);
         }
 
         public void HavePuck_SelfHavePuck_TurnToStrike()
         {
-            var bestHitPosition = GetBestHitPosition(self);
+            var bestHitPosition = GetBestHitPosition(self, this.currentSituation);
 
             move.SpeedUp = 0;
             move.Turn = self.GetAngleTo(bestHitPosition.X, bestHitPosition.Y);
@@ -263,9 +270,9 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             move.Action = ActionType.Strike;
         }
 
-        public void HavePuck_GoToBase()
+        public void HavePuck_GoToRetreatPosition()
         {
-            var basePoint = Manager.DefenderPosition;
+            var basePoint = Manager.RetreatPosition;
 
             move.Turn = self.GetAngleTo(basePoint.X, basePoint.Y);
             move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
@@ -294,13 +301,6 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public static Point GetBestPositionToAttack(Hockeyist self, World world)
         {
-            //if (self.GetDistanceTo(Manager.BestTopStrikePosition.X, Manager.BestTopStrikePosition.Y) > self.GetDistanceTo(Manager.BestBottomStrikePosition.X, Manager.BestBottomStrikePosition.Y))
-            //{
-            //    return Manager.BestBottomStrikePosition;
-            //}
-
-            //return Manager.BestTopStrikePosition;
-
             var minDistOpponentToTop = world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestTopStrikePosition)).Min();
             var minDistOpponentToBottom = world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestBottomStrikePosition)).Min();
             var selfDistToTop = self.GetDistanceTo(Manager.BestTopStrikePosition);
@@ -319,13 +319,14 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             }
         }
 
-        public static Point GetBestHitPosition(Hockeyist self)
+        public static Point GetBestHitPosition(Hockeyist self, CurrentSituation currentSituation)
         {
             //return GetBestPositionToAttack(self) == Manager.BestTopStrikePosition ? Manager.BestBottomHitPosition : Manager.BestTopHitPosition;
-            return self.GetDistanceTo(Manager.BestTopHitPosition.X, Manager.BestTopHitPosition.Y) >
-                self.GetDistanceTo(Manager.BestBottomHitPosition.X, Manager.BestBottomHitPosition.Y)
-                ? Manager.BestTopHitPosition
-                : Manager.BestBottomHitPosition;
+            //return self.GetDistanceTo(Manager.BestTopHitPosition.X, Manager.BestTopHitPosition.Y) >
+            //    self.GetDistanceTo(Manager.BestBottomHitPosition.X, Manager.BestBottomHitPosition.Y)
+            //    ? Manager.BestTopHitPosition
+            //    : Manager.BestBottomHitPosition;
+            return currentSituation.BestHitPosition;
         }
     }
 }

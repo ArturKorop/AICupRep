@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurrentSituation.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Model\ActionType.cs" />
     <Compile Include="IStrategy.cs" />
