@@ -49,11 +49,11 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         {
             var opponent = world.GetOpponentPlayer();
             var rinkBorderLength = ((game.RinkBottom - game.RinkTop) - game.GoalNetHeight) / 2;
-            var bestTopY = game.RinkTop + rinkBorderLength * 2/3;
-            var bestBottomY = game.RinkBottom - rinkBorderLength * 2/3;
+            var bestTopY = game.RinkTop + rinkBorderLength * 0.5;
+            var bestBottomY = game.RinkBottom - rinkBorderLength * 0.5;
 
             var rinkLength = game.RinkRight - game.RinkLeft;
-            var bestAttackerRinkLength = rinkLength / 2 * 0.8;
+            var bestAttackerRinkLength = rinkLength / 2 * 0.7;
             var bestX = 0.0;
             var bestHitX = 0.0;
             var retreatX = 0.0;

@@ -226,12 +226,22 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             var teammateNearestToPuck = world.NearestTeammateToPuck();
             var nearestOpponentToTeammateWithPuck = teammateNearestToPuck.NearestOpponent(world);
 
-            move.Turn = self.GetAngleTo(nearestOpponentToTeammateWithPuck);
-            move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
-            
-            if(self.GetDistanceTo(nearestOpponentToTeammateWithPuck) < game.StickLength && Math.Abs(self.GetAngleTo(nearestOpponentToTeammateWithPuck)) < game.StickSector / 2)
+            if (self.GetDistanceTo(nearestOpponentToTeammateWithPuck) < game.StickLength && Math.Abs(self.GetAngleTo(nearestOpponentToTeammateWithPuck)) < game.StickSector / 2)
             {
                 move.Action = ActionType.Strike;
+            }
+
+            var targetPosition = Manager.RetreatPosition;
+
+            if (self.GetDistanceTo(targetPosition) > 100)
+            {
+                this.move.Turn = this.self.GetAngleTo(targetPosition.X, targetPosition.Y);
+                this.move.SpeedUp = CalculateOptimalSpeed(1, this.move.Turn);
+            }
+            else
+            {
+                this.move.Turn = this.self.GetAngleTo(this.world.Puck);
+                this.move.SpeedUp = 0;
             }
         }
 
