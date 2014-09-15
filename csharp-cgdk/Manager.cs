@@ -8,10 +8,6 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 {
     public static class Manager
     {
-        public static long DefenderId { get; set; }
-
-        public static long ForwardId { get; set; }
-
         public static Point BestTopStrikePosition { get; set; }
 
         public static Point BestTopHitPosition { get; set; }
@@ -82,16 +78,6 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
     public static class Extensions
     {
-        public static bool IsDeffender(this Hockeyist hockeyist)
-        {
-            return hockeyist.Id == Manager.DefenderId;
-        }
-
-        public static bool IsForward(this Hockeyist hockeyist)
-        {
-            return hockeyist.Id == Manager.ForwardId;
-        }
-
         public static PuckStates PuckState(this World world, Hockeyist self)
         {
             return 
