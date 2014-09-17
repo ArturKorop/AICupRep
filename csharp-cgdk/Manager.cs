@@ -32,6 +32,10 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public static double BottomThirdY { get; set; }
 
+        public static int AttackerId { get; set; }
+
+        public static int DefenderId { get; set; }
+
         public static Dictionary<long, SelfHavePuckStates?> RetreatList;
 
         private static bool isInit;
@@ -86,6 +90,30 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             BestBottomHitPosition = new Point(bestHitX, opponent.NetBottom - 20);
 
             RetreatPosition = new Point(retreatX, FieldCenter.Y);
+
+            Hockeyist nearestToPuck = null;
+            Hockeyist farestToPuck = null;
+            double nearestDist = double.MaxValue;
+            double farestDist = double.MinValue;
+
+            foreach (var hockeyiest in world.MyTeam())
+            {
+                var dist = hockeyiest.GetDistanceTo(world.Puck);
+                if(dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestToPuck = hockeyiest;
+                }
+                
+                if(dist > farestDist)
+                {
+                    farestDist = dist;
+                    farestToPuck = hockeyiest;
+                }
+            }
+
+            AttackerId = nearestToPuck.Id;
+            DefenderId = farestToPuck.Id;
         }
 
         private static void CalculateNetCentres(World world, Game game)
@@ -269,6 +297,16 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             }
 
             return nearestOpponent ?? world.OpponentTeam().First();
+        }
+
+        public static bool IsAttacker(this Hockeyist self)
+        {
+            return self.Id == Manager.AttackerId;
+        }
+
+        public static Hockeyist IsDefender(this Hockeyist self)
+        {
+            return self.Id == Manager.DefenderId;
         }
     }
 
