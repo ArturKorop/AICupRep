@@ -311,8 +311,8 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public static Point GetBestPositionToAttack(Hockeyist self, World world)
         {
-            var minDistOpponentToTop = world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestTopStrikePosition)).Min();
-            var minDistOpponentToBottom = world.Opponents().Select(x=>x.GetDistanceTo(Manager.BestBottomStrikePosition)).Min();
+            var minDistOpponentToTop = world.OpponentTeam().Select(x=>x.GetDistanceTo(Manager.BestTopStrikePosition)).Min();
+            var minDistOpponentToBottom = world.OpponentTeam().Select(x => x.GetDistanceTo(Manager.BestBottomStrikePosition)).Min();
             var selfDistToTop = self.GetDistanceTo(Manager.BestTopStrikePosition);
             var selfDistToBottom = self.GetDistanceTo(Manager.BestBottomStrikePosition);
             if(Math.Min(selfDistToTop, selfDistToBottom) > 300)

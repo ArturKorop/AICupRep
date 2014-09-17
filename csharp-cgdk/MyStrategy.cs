@@ -9,7 +9,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
     {
         public void Move(Hockeyist self, World world, Game game, Move move)
         {
-            Manager.SetRoles(world, game);
+            Manager.Init(world, game);
 
             StateMachine.Run(world, move, self, game);
         }
