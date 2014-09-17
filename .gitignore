@@ -21,6 +21,7 @@ build/
 local-runner
 ServerVersion
 ServerVersion2
+Archive
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
