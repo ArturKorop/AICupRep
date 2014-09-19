@@ -65,5 +65,20 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         {
             return unit.ToPoint().DistanceToSegment(a, b);
         }
+
+        public static bool IsInMyRinkSide(this Point point)
+        {
+            return point.X.IsBetweenCoord(Manager.MyNetCenter.X, Manager.FieldCenter.X);
+        }
+
+        public static bool IsInOpponentSide(this Point point)
+        {
+            return !point.IsInMyRinkSide();
+        }
+
+        public static bool IsBetweenCoord(this double x, double a, double b)
+        {
+            return x > Math.Min(a, b) && x < Math.Max(a, b);
+        }
     }
 }

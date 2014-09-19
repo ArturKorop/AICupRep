@@ -16,5 +16,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public const double DistanceFromNetBorderToBestHitTarget = 20;
 
         public const double RetreatX = 300;
+
+        public const double DefenderRangeFromNet = 30;
     }
 }

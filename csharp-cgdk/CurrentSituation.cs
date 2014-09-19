@@ -131,11 +131,5 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         //    return new RinkPosition(horizontalPosition, verticalPosition);
         //}
-
-        public static bool IsBetweenCoord(double x, double a, double b)
-        {
-            return x > Math.Min(a, b) && x < Math.Max(a, b);
-        }
-
     }
 }

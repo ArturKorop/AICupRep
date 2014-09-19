@@ -8,11 +8,16 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 {
     public class Actions
     {
-        private World world;
-        private Game game;
-        private Hockeyist self;
-        private Move move;
-        private CurrentSituation currentSituation;
+        protected World world;
+        protected Game game;
+        protected Hockeyist self;
+        protected Move move;
+        protected CurrentSituation currentSituation;
+
+        protected Unit Puck
+        {
+            get { return this.world.Puck; }
+        }
 
         public Actions(World world, Game game, Hockeyist self, Move move, CurrentSituation currentSituation)
         {
@@ -26,7 +31,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public virtual void FreePuck_SelfNearestToPuckAction()
         {
             move.Turn = self.GetAngleTo(world.Puck);
-            move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
+            move.SpeedUp = CalculateOptimalSpeed(move.Turn);
             move.Action = ActionType.TakePuck;
         }
 
@@ -45,7 +50,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             if (self.GetDistanceTo(targetPosition) > 100)
             {
                 this.move.Turn = this.self.GetAngleTo(targetPosition.X, targetPosition.Y);
-                this.move.SpeedUp = CalculateOptimalSpeed(1, this.move.Turn);
+                this.move.SpeedUp = CalculateOptimalSpeed(this.move.Turn);
             }
             else
             {
@@ -85,7 +90,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public virtual void OpponentHavePuck_SelfNearestToOpponentWithPuck_CanStrikeOpponent()
         {
             move.Turn = self.GetAngleTo(world.Puck);
-            move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
+            move.SpeedUp = CalculateOptimalSpeed(move.Turn);
             move.Action = ActionType.Strike;
         }
 
@@ -94,10 +99,10 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             var basePoint = Manager.RetreatPosition;
 
             move.Turn = self.GetAngleTo(basePoint.X, basePoint.Y);
-            move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
+            move.SpeedUp = CalculateOptimalSpeed(move.Turn);
         }
 
-        public static double CalculateOptimalSpeed(double speed, double turn)
+        public static double CalculateOptimalSpeed(double turn, double speed = 1)
         {
             var modTurn = Math.Abs(turn);
             if (modTurn > Math.PI)
@@ -141,6 +146,12 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public static Point GetBestHitPosition(Hockeyist self, CurrentSituation currentSituation)
         {
             return currentSituation.BestHitPosition;
+        }
+
+        protected void SetTurnAndSpeed(double turn)
+        {
+            this.move.Turn = turn;
+            this.move.SpeedUp = CalculateOptimalSpeed(turn);
         }
     }
 }
