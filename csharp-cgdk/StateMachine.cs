@@ -117,7 +117,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             {
                 case HavePuckStates.SelfHavePuck:
                     {
-                        var selfHavePuckState = world.SelfHavePuckState(self, currentSituation);
+                        var selfHavePuckState = world.SelfHavePuckState(self, currentSituation, game);
                         switch (selfHavePuckState)
                         {
                             case SelfHavePuckStates.MoveToBestStrikePosition:
@@ -239,7 +239,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public void FreePuck_TeammateNearestToPuck()
         {
             var teammateNearestToPuck = world.NearestTeammateToPuck();
-            var nearestOpponentToTeammateWithPuck = teammateNearestToPuck.NearestOpponent(world);
+            var nearestOpponentToTeammateWithPuck = teammateNearestToPuck.NearestOpponent(world, game);
 
             if (self.GetDistanceTo(nearestOpponentToTeammateWithPuck) < game.StickLength && Math.Abs(self.GetAngleTo(nearestOpponentToTeammateWithPuck)) < game.StickSector / 2)
             {

@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CurrentSituation.cs" />
+    <Compile Include="HockeyistExtensions.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Model\ActionType.cs" />
     <Compile Include="IStrategy.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="MyStrategy.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Model\PlayerContext.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteProcessClient.cs" />
     <Compile Include="Runner.cs" />
@@ -87,7 +89,10 @@
     <Compile Include="Model\HockeyistType.cs" />
     <Compile Include="Model\Unit.cs" />
     <Compile Include="Model\World.cs" />
+    <Compile Include="StateExtensions.cs" />
     <Compile Include="StateMachine.cs" />
+    <Compile Include="UnitExtensions.cs" />
+    <Compile Include="WorldExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
