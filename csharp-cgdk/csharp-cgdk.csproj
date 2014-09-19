@@ -69,7 +69,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="CurrentSituation.cs" />
+    <Compile Include="DefenderActions.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="HockeyistExtensions.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Model\ActionType.cs" />

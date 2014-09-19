@@ -123,7 +123,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                                 break;
                             case SelfHavePuckStates.Swing:
                                 {
-                                    actions.HavePuck_SelfHavePuck_Swing();
+                                    actions.Swing();
                                 }
                                 break;
                             case SelfHavePuckStates.TurnToStrike:

@@ -23,14 +23,14 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             this.currentSituation = currentSituation;
         }
 
-        public void FreePuck_SelfNearestToPuckAction()
+        public virtual void FreePuck_SelfNearestToPuckAction()
         {
             move.Turn = self.GetAngleTo(world.Puck);
             move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
             move.Action = ActionType.TakePuck;
         }
 
-        public void FreePuck_TeammateNearestToPuck()
+        public virtual void FreePuck_TeammateNearestToPuck()
         {
             var teammateNearestToPuck = world.NearestTeammateToPuck();
             var nearestOpponentToTeammateWithPuck = teammateNearestToPuck.NearestOpponent(world, game);
@@ -60,13 +60,13 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             move.Action = ActionType.Strike;
         }
 
-        public void HavePuck_SelfHavePuck_Swing()
+        public void Swing()
         {
             move.SpeedUp = 1;
             move.Action = ActionType.Swing;
         }
 
-        public void HavePuck_SelfHavePuck_MoveToBestStrikePosition()
+        public virtual void HavePuck_SelfHavePuck_MoveToBestStrikePosition()
         {
             var bestStrikePosition = GetBestPositionToAttack(self, world);
 
@@ -74,7 +74,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             move.SpeedUp = 1;//CalculateOptimalSpeed(1, move.Turn);
         }
 
-        public void HavePuck_SelfHavePuck_TurnToStrike()
+        public virtual void HavePuck_SelfHavePuck_TurnToStrike()
         {
             var bestHitPosition = GetBestHitPosition(self, this.currentSituation);
 
@@ -82,14 +82,14 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             move.Turn = self.GetAngleTo(bestHitPosition.X, bestHitPosition.Y);
         }
 
-        public void OpponentHavePuck_SelfNearestToOpponentWithPuck_CanStrikeOpponent()
+        public virtual void OpponentHavePuck_SelfNearestToOpponentWithPuck_CanStrikeOpponent()
         {
             move.Turn = self.GetAngleTo(world.Puck);
             move.SpeedUp = CalculateOptimalSpeed(1, move.Turn);
             move.Action = ActionType.Strike;
         }
 
-        public void HavePuck_GoToRetreatPosition()
+        public virtual void HavePuck_GoToRetreatPosition()
         {
             var basePoint = Manager.RetreatPosition;
 
