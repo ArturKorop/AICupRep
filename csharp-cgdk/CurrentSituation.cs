@@ -103,10 +103,17 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         {
             var me = this.world.GetMyPlayer();
             var goalie = this.world.MyGoalie();
-            var defX = goalie.X > Manager.FieldCenter.X ? goalie.X - Constants.RangeFromGoalieX : goalie.X + Constants.RangeFromGoalieX;
-            var defY = goalie.Y > Manager.FieldCenter.Y ? me.NetTop + Constants.RangeFromGoalieY : me.NetBottom - Constants.RangeFromGoalieY;
+            if (goalie != null)
+            {
+                var defX = goalie.X > Manager.FieldCenter.X ? goalie.X - Constants.RangeFromGoalieX : goalie.X + Constants.RangeFromGoalieX;
+                var defY = goalie.Y > Manager.FieldCenter.Y ? me.NetTop + Constants.RangeFromGoalieY : me.NetBottom - Constants.RangeFromGoalieY;
 
-            this.DefenderPosition = new Point(defX, defY);
+                this.DefenderPosition = new Point(defX, defY);
+            }
+            else
+            {
+                this.DefenderPosition = Manager.DefenderPosition;
+            }
 
         }
 
