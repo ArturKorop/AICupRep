@@ -61,6 +61,11 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             return unit.GetDistanceTo(point.X, point.Y);
         }
 
+        public static double GetAngleTo(this Unit unit, Point point)
+        {
+            return unit.GetAngleTo(point.X, point.Y);
+        }
+
         public static double DistanceToSegment(this Unit unit, Point a, Point b)
         {
             return unit.ToPoint().DistanceToSegment(a, b);

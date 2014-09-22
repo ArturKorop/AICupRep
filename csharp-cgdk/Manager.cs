@@ -50,17 +50,22 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
                 isInit = true;
             }
+
+            if(world.GetMyPlayer().IsJustMissedGoal || world.GetMyPlayer().IsJustScoredGoal)
+            {
+                isInit = false;
+            }
         }
 
         private static void CalculateBestStrikePosition(World world, Game game)
         {
             var opponent = world.GetOpponentPlayer();
             var rinkBorderLength = ((game.RinkBottom - game.RinkTop) - game.GoalNetHeight) / 2;
-            var bestTopY = game.RinkTop + rinkBorderLength * 0.5;
-            var bestBottomY = game.RinkBottom - rinkBorderLength * 0.5;
+            var bestTopY = game.RinkTop;// + rinkBorderLength * 0.5;
+            var bestBottomY = game.RinkBottom;// - rinkBorderLength * 0.5;
 
             var rinkLength = game.RinkRight - game.RinkLeft;
-            var bestAttackerRinkLength = rinkLength / 2 * 0.7;
+            var bestAttackerRinkLength = (rinkLength / 2) * 0.8;
             var bestX = 0.0;
             var bestHitX = 0.0;
             var retreatX = 0.0;
@@ -115,6 +120,13 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
             AttackerId = nearestToPuck.Id;
             DefenderId = farestToPuck.Id;
+        }
+
+        public static void ChangeAttVsDef()
+        {
+            var tempId = Manager.AttackerId;
+            Manager.AttackerId = Manager.DefenderId;
+            Manager.DefenderId = tempId;
         }
 
         private static void InitRetreateList(World world)

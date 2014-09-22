@@ -11,7 +11,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public static void Run(World world, Move move, Hockeyist self, Game game)
         {
             var currentSituation = new CurrentSituation(world, game, self);
-            var actions = new Actions(world, game, self, move, currentSituation);
+            var actions = self.IsAttacker() ? new AttackerActions(world, game, self, move, currentSituation) as Actions : new DefenderActions(world, game, self, move, currentSituation) as Actions;
             var puckState = world.PuckState(self);
 
             switch(puckState)
@@ -51,7 +51,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                     break;
                 case FreePuckStates.TeammateNearestToPuck:
                     {
-                        actions.FreePuck_SelfNearestToPuckAction();
+                        actions.FreePuck_TeammateNearestToPuck();
                     }
                     break;
             }
@@ -59,46 +59,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         private static void OpponentHavePuckState(World world, Game game, Hockeyist self, Actions actions)
         {
-            var opponentHavePuckState = world.OpponentHavePuckState(self);
-            switch (opponentHavePuckState)
-            {
-                case OpponentHavePuckStates.SelfNearestToOpponentWithPuck:
-                    {
-                        var selfNearestToOpponentWithPuckState = world.SelfNearestToOpponentWithPuckState(self, game);
-                        switch (selfNearestToOpponentWithPuckState)
-                        {
-                            case SelfNearestToOpponentWithPuckStates.CanStrikeOpponent:
-                                {
-                                    actions.OpponentHavePuck_SelfNearestToOpponentWithPuck_CanStrikeOpponent();
-                                }
-                                break;
-                            case SelfNearestToOpponentWithPuckStates.CannotStrikeOpponent:
-                                {
-                                    actions.FreePuck_SelfNearestToPuckAction();
-                                }
-                                break;
-                        }
-                    }
-                    break;
-                case OpponentHavePuckStates.TeammatesNearestToOpponentWithPuck:
-                    {
-                        var selfNearestToOpponentWithPuckState = world.SelfNearestToOpponentWithPuckState(self, game);
-                        switch (selfNearestToOpponentWithPuckState)
-                        {
-                            case SelfNearestToOpponentWithPuckStates.CanStrikeOpponent:
-                                {
-                                    actions.OpponentHavePuck_SelfNearestToOpponentWithPuck_CanStrikeOpponent();
-                                }
-                                break;
-                            case SelfNearestToOpponentWithPuckStates.CannotStrikeOpponent:
-                                {
-                                    actions.FreePuck_SelfNearestToPuckAction();
-                                }
-                                break;
-                        }
-                    }
-                    break;
-            }
+            actions.OpponentHavePuck();
         }
 
         private static void MeHavePuck(World world, Game game, Hockeyist self, Actions actions, CurrentSituation currentSituation)
@@ -108,40 +69,12 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             {
                 case HavePuckStates.SelfHavePuck:
                     {
-                        var selfHavePuckState = world.SelfHavePuckState(self, currentSituation, game);
-                        switch (selfHavePuckState)
-                        {
-                            case SelfHavePuckStates.MoveToBestStrikePosition:
-                                {
-                                    actions.HavePuck_SelfHavePuck_MoveToBestStrikePosition();
-                                }
-                                break;
-                            case SelfHavePuckStates.Strike:
-                                {
-                                    actions.Strike();
-                                }
-                                break;
-                            case SelfHavePuckStates.Swing:
-                                {
-                                    actions.Swing();
-                                }
-                                break;
-                            case SelfHavePuckStates.TurnToStrike:
-                                {
-                                    actions.HavePuck_SelfHavePuck_TurnToStrike();
-                                }
-                                break;
-                            case SelfHavePuckStates.MoveToRetreatPosition:
-                                {
-                                    actions.HavePuck_GoToRetreatPosition();
-                                }
-                                break;
-                        }
+                        actions.MeHavePuck_SelfHavePuck();
                     }
                     break;
                 case HavePuckStates.TeammateHavePuck:
                     {
-                        actions.FreePuck_TeammateNearestToPuck();
+                        actions.MeHavePuck_TeammateHavePuck();
                     }
                     break;
             }

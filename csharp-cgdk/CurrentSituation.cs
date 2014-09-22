@@ -16,6 +16,8 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         //public Dictionary<Hockeyist, RinkPosition> TeammatesPositions;
 
+        public Point DefenderPosition { get; set; }
+
         public Point BestHitPosition { get; set; }
 
         private World world;
@@ -36,6 +38,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             this.CalculateGameScore();
             this.CalculateRinkPositions();
             this.CalculateBestHitPosition();
+            this.CalculateBestDefenderPositon();
         }
 
         private void CalculateGameScore()
@@ -94,6 +97,17 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             {
                 this.BestHitPosition = new Point(hitX, opponent.NetTop + Constants.DistanceFromNetBorderToBestHitTarget);
             }
+        }
+
+        private void CalculateBestDefenderPositon()
+        {
+            var me = this.world.GetMyPlayer();
+            var goalie = this.world.MyGoalie();
+            var defX = goalie.X > Manager.FieldCenter.X ? goalie.X - Constants.RangeFromGoalieX : goalie.X + Constants.RangeFromGoalieX;
+            var defY = goalie.Y > Manager.FieldCenter.Y ? me.NetTop + Constants.RangeFromGoalieY : me.NetBottom - Constants.RangeFromGoalieY;
+
+            this.DefenderPosition = new Point(defX, defY);
+
         }
 
         //private static RinkPosition CalculateRinkPosition(Hockeyist hockeyist)

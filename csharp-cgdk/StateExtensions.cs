@@ -27,7 +27,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             Manager.RetreatList[self.Id] = null;
             var selfDistanceToPuck = self.GetDistanceTo(world.Puck);
 
-            return world.Teammates(self).Max(x => x.GetDistanceTo(world.Puck)) > selfDistanceToPuck
+            return world.Teammates(self).Max(x => x.GetDistanceTo(world.Puck)) < selfDistanceToPuck
                 ? FreePuckStates.TeammateNearestToPuck
                 : FreePuckStates.SelfNearestToPuck;
         }
@@ -96,10 +96,10 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                 }
             }
 
-            var distanceToNet = self.GetDistanceTo(world.OpponentNetCenter().X, world.OpponentNetCenter().Y);
+            var distanceToNet = self.GetDistanceTo(Manager.OpponentNetCenter.X, Manager.OpponentNetCenter.Y);
             var bestPosToAttack = Actions.GetBestPositionToAttack(self, world);
             var distanceToBestStrikePosition = self.GetDistanceTo(bestPosToAttack.X, bestPosToAttack.Y);
-            var distanceBetweenNetAndBestStrikePosition = bestPosToAttack.DistanceTo(world.OpponentNetCenter());
+            var distanceBetweenNetAndBestStrikePosition = bestPosToAttack.DistanceTo(Manager.OpponentNetCenter);
 
             if (distanceToNet < distanceBetweenNetAndBestStrikePosition || distanceToBestStrikePosition < 50 || distanceToNet < distanceToBestStrikePosition)
             {
@@ -115,7 +115,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                 {
                     if (Math.Abs(self.GetAngleTo(bestHitPosition.X, bestHitPosition.Y)) < Constants.StrikeAngle)
                     {
-                        if (self.GetDistanceTo(self.NearestOpponent(world, game)) > Constants.DangerDistanceToOpponent && self.GetDistanceTo(bestHitPosition.X, bestHitPosition.Y) > Constants.DistanceToStrike)
+                        if (self.GetDistanceTo(self.NearestOpponentTime(world, game)) > Constants.DangerDistanceToOpponent && self.GetDistanceTo(bestHitPosition.X, bestHitPosition.Y) > Constants.DistanceToStrike)
                         {
                             return SelfHavePuckStates.Swing;
                         }

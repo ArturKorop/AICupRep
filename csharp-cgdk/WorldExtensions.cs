@@ -66,12 +66,12 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             return world.Hockeyists.SingleOrDefault(x => x.Id == world.Puck.OwnerHockeyistId);
         }
 
-        public static Point OpponentNetCenter(this World world)
-        {
-            var opponent = world.GetOpponentPlayer();
+        //public static Point OpponentNetCenter(this World world)
+        //{
+        //    var opponent = world.GetOpponentPlayer();
 
-            return new Point((opponent.NetLeft + opponent.NetRight) / 2, (opponent.NetTop + opponent.NetBottom) / 2);
-        }
+        //    return new Point((opponent.NetLeft + opponent.NetRight) / 2, (opponent.NetTop + opponent.NetBottom) / 2);
+        //}
 
         #endregion
 
