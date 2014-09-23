@@ -8,14 +8,6 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 {
     public class CurrentSituation
     {
-        //public GameScores GameScore { get; set; }
-
-        //public RinkPosition SelfPosition { get; set; }
-
-        //public Dictionary<Hockeyist, RinkPosition> OpponentPositions;
-
-        //public Dictionary<Hockeyist, RinkPosition> TeammatesPositions;
-
         public Point DefenderPosition { get; set; }
 
         public Point BestHitPosition { get; set; }
@@ -35,43 +27,8 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         private void Init()
         {
-            this.CalculateGameScore();
-            this.CalculateRinkPositions();
             this.CalculateBestHitPosition();
             this.CalculateBestDefenderPositon();
-        }
-
-        private void CalculateGameScore()
-        {
-            //if (this.world.GetMyPlayer().GoalCount > this.world.GetOpponentPlayer().GoalCount)
-            //{
-            //    this.GameScore = GameScores.Win;
-            //}
-            //else if (this.world.GetMyPlayer().GoalCount < this.world.GetOpponentPlayer().GoalCount)
-            //{
-            //    this.GameScore = GameScores.Lose;
-            //}
-            //else
-            //{
-            //    this.GameScore = GameScores.Draw;
-            //}
-        }
-
-        private void CalculateRinkPositions()
-        {
-            //this.SelfPosition = CalculateRinkPosition(self);
-            //this.OpponentPositions = new Dictionary<Hockeyist, RinkPosition>();
-            //this.TeammatesPositions = new Dictionary<Hockeyist, RinkPosition>();
-
-            //foreach (var hockeyist in this.world.OpponentTeam())
-            //{
-            //    this.OpponentPositions.Add(hockeyist, CalculateRinkPosition(hockeyist));
-            //}
-
-            //foreach (var hockeyist in this.world.Teammates(this.self))
-            //{
-            //    this.TeammatesPositions.Add(hockeyist, CalculateRinkPosition(hockeyist));
-            //}
         }
 
         private void CalculateBestHitPosition()
@@ -79,7 +36,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             var opponent = world.GetOpponentPlayer();
             var opponentGoalie = this.world.OpponentGoalie();
             Point opponentGoaliePosition = null;
-            if(opponentGoalie == null)
+            if (opponentGoalie == null)
             {
                 opponentGoaliePosition = Manager.FieldCenter;
             }
@@ -106,7 +63,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             if (goalie != null)
             {
                 var defX = goalie.X > Manager.FieldCenter.X ? goalie.X - Constants.RangeFromGoalieX : goalie.X + Constants.RangeFromGoalieX;
-                var defY = goalie.Y > Manager.FieldCenter.Y ? me.NetTop + Constants.RangeFromGoalieY : me.NetBottom - Constants.RangeFromGoalieY;
+                var defY = goalie.Y >= Manager.FieldCenter.Y ? me.NetTop + Constants.RangeFromGoalieY : me.NetBottom - Constants.RangeFromGoalieY;
 
                 this.DefenderPosition = new Point(defX, defY);
             }
@@ -116,41 +73,5 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             }
 
         }
-
-        //private static RinkPosition CalculateRinkPosition(Hockeyist hockeyist)
-        //{
-        //    var x = hockeyist.X;
-        //    var y = hockeyist.Y;
-
-        //    RinkHorizontalPosition horizontalPosition;
-        //    if (IsBetweenCoord(x, Manager.MyNetCenter.X, Manager.MyThirdX))
-        //    {
-        //        horizontalPosition = RinkHorizontalPosition.My;
-        //    }
-        //    else if (IsBetweenCoord(x, Manager.MyThirdX, Manager.OpponentThirdX))
-        //    {
-        //        horizontalPosition = RinkHorizontalPosition.Center;
-        //    }
-        //    else
-        //    {
-        //        horizontalPosition = RinkHorizontalPosition.Opponent;
-        //    }
-
-        //    RinkVerticalPosition verticalPosition;
-        //    if (y < Manager.TopThirdY)
-        //    {
-        //        verticalPosition = RinkVerticalPosition.Top;
-        //    }
-        //    else if (y > Manager.BottomThirdY)
-        //    {
-        //        verticalPosition = RinkVerticalPosition.Bottom;
-        //    }
-        //    else
-        //    {
-        //        verticalPosition = RinkVerticalPosition.Center;
-        //    }
-
-        //    return new RinkPosition(horizontalPosition, verticalPosition);
-        //}
     }
 }

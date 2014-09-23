@@ -14,6 +14,15 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         protected Move move;
         protected CurrentSituation currentSituation;
 
+        protected double DistanceToBestAttackPosition { get { return this.self.GetDistanceTo(this.BestPositionToAttack); } }
+        protected double AngleToBestAttackPosition { get { return this.self.GetAngleTo(this.BestPositionToAttack); } }
+        protected double DistanceToPuck { get { return this.self.GetDistanceTo(this.Puck); } }
+        protected double AngleToPuck { get { return this.self.GetAngleTo(this.Puck); } }
+        protected Hockeyist NearestOpponent { get { return this.self.NearestOpponentDistance(this.world); } }
+        protected bool CanHitPuck { get { return this.self.CanHitPuck(this.world, this.game); } }
+        protected Point BestPositionToAttack { get { return GetBestPositionToAttack(this.self, this.world, this.game); } }
+        protected bool CanDoAction { get { return this.self.RemainingCooldownTicks == 0; } }
+
         protected Unit Puck
         {
             get { return this.world.Puck; }
@@ -95,7 +104,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public void AttackerWaitPuck()
         {
-            var bestAttackPosition = GetBestPositionToAttack(this.self, this.world);
+            var bestAttackPosition = BestPositionToAttack;
 
             if (this.self.IsNearPoint(bestAttackPosition, Constants.NearPointDistance))
             {
@@ -110,9 +119,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public void HavePuck_SelfHavePuck_MoveToBestStrikePosition()
         {
-            var bestStrikePosition = GetBestPositionToAttack(self, world);
-
-            move.Turn = self.GetAngleTo(bestStrikePosition.X, bestStrikePosition.Y);
+            move.Turn = self.GetAngleTo(BestPositionToAttack);
             move.SpeedUp = 1;
         }
 
@@ -160,12 +167,13 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             return speed * (1 - modTurn / Math.PI);
         }
 
-        public static Point GetBestPositionToAttack(Hockeyist self, World world)
+        public static Point GetBestPositionToAttack(Hockeyist self, World world, Game game)
         {
-            //var minDistOpponentToTop = world.OpponentTeam().Select(x => x.GetDistanceTo(Manager.BestTopStrikePosition)).Min();
-            //var minDistOpponentToBottom = world.OpponentTeam().Select(x => x.GetDistanceTo(Manager.BestBottomStrikePosition)).Min();
-            var selfDistToTop = self.GetDistanceTo(Manager.BestTopStrikePosition);
-            var selfDistToBottom = self.GetDistanceTo(Manager.BestBottomStrikePosition);
+            var nearestOpponent = self.NearestOpponentDistance(world);
+            
+
+            var selfDistToTop = self.ApproximateTimeToGoToTarget(Manager.BestTopStrikePosition, game);
+            var selfDistToBottom = self.ApproximateTimeToGoToTarget(Manager.BestBottomStrikePosition, game);
             //if (Math.Min(selfDistToTop, selfDistToBottom) > 200)
             //{
             //    return minDistOpponentToBottom > minDistOpponentToTop
@@ -178,7 +186,18 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             //        ? Manager.BestTopStrikePosition
             //        : Manager.BestBottomStrikePosition;
             //}
-            return selfDistToBottom < selfDistToTop ? Manager.BestBottomStrikePosition : Manager.BestTopStrikePosition;
+            //return selfDistToBottom < selfDistToTop ? Manager.BestBottomStrikePosition : Manager.BestTopStrikePosition;
+
+            //return nearestOpponent.Y > Manager.FieldCenter.Y && self.Y > nearestOpponent.Y
+            //    ? Manager.BestTopStrikePosition
+            //    : nearestOpponent.Y < Manager.FieldCenter.Y && self.Y < nearestOpponent.Y
+            //        ? Manager.BestBottomStrikePosition
+            //        : selfDistToBottom < selfDistToTop
+            //            ? Manager.BestBottomStrikePosition
+            //            : Manager.BestTopStrikePosition;
+            return nearestOpponent.Y > self.Y
+                ? Manager.BestTopStrikePosition
+                : Manager.BestBottomStrikePosition;
 
         }
 

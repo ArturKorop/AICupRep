@@ -12,6 +12,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         {
             var currentSituation = new CurrentSituation(world, game, self);
             var actions = self.IsAttacker() ? new AttackerActions(world, game, self, move, currentSituation) as Actions : new DefenderActions(world, game, self, move, currentSituation) as Actions;
+            //if (self.IsAttacker()) return;
             var puckState = world.PuckState(self);
 
             switch(puckState)

@@ -18,12 +18,25 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             {
                 if(this.self.CanHitPuck(this.world, this.game))
                 {
-                    this.move.Action = ActionType.TakePuck;
+                    if(this.Puck.Speed() <= 15)
+                    {
+                        this.move.Action = ActionType.TakePuck;
+                    }
+                    else
+                    {
+                        if (this.self.GetDistanceTo(this.NearestOpponent) > 300)
+                        {
+                            this.move.Action = ActionType.TakePuck;
+                        }
+                        else
+                        {
+                            this.move.Action = ActionType.Strike;
+                        }
+                    }
                 }
                 else
                 {
-                    this.SetTurnAndSpeed(this.self.GetAngleTo(this.Puck));
-                    this.move.Action = ActionType.TakePuck;
+                    this.SetTurnAndSpeed(this.AngleToPuck);
                 }
             }
             else
@@ -35,31 +48,11 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         public override void FreePuck_TeammateNearestToPuck()
         {
             this.GoToDefenderPosition();
-            this.move.Action = ActionType.TakePuck;
         }
 
         public override void MeHavePuck_SelfHavePuck()
         {
-            var attacker = this.world.Teammates(this.self).First(x => x.IsAttacker());
-            var angleToAttacker = this.self.GetAngleTo(attacker);
-
-            if (this.world.OpponentTeam().Select(x => x.DistanceToSegment(this.self.ToPoint(), attacker.ToPoint())).Min() > 100)
-            {
-
-                if (Math.Abs(angleToAttacker) <= this.game.PassSector / 2)
-                {
-                    this.Pass(angleToAttacker, this.self.GetDistanceTo(attacker));
-                }
-                else
-                {
-                    this.move.Turn = angleToAttacker;
-                    this.move.SpeedUp = 0;
-                }
-            }
-            else
-            {
-                Manager.ChangeAttVsDef();
-            }
+            Manager.ChangeAttVsDef(this.world, this.game);
         }
 
         public override void MeHavePuck_TeammateHavePuck()
@@ -73,12 +66,19 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             {
                 if (this.self.CanHitPuck(world, game))
                 {
-                    this.move.Action = ActionType.TakePuck;
+                    this.move.Action = ActionType.Strike;
                 }
                 else
                 {
-                    this.GoToDefenderPosition();
-                    this.move.Action = ActionType.TakePuck;
+                    var distanceToPuck = this.self.GetDistanceTo(this.Puck);
+                    if(distanceToPuck > 200)
+                    {
+                        this.GoToDefenderPosition();
+                    }
+                    else
+                    {
+                        this.SetTurnAndSpeed(this.self.GetAngleTo(this.Puck));
+                    }
                 }
             }
             else
@@ -90,36 +90,111 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         private void GoToDefenderPosition()
         {
             var defenderPosition = this.currentSituation.DefenderPosition;
-            
-            if (this.self.GetDistanceTo(defenderPosition) < 15)
+            var distanceToDefenderPosition = this.self.GetDistanceTo(defenderPosition);
+
+            var multiplier = 1;
+            var angleToDefenderPosition = this.self.GetAngleTo(defenderPosition);
+            double angleToTurn = 0.0;
+            if (Math.Abs(angleToDefenderPosition) >= Math.PI / 2)
             {
-                this.move.Turn = this.self.GetAngleTo(this.Puck);
-                this.move.SpeedUp = 0;
+                angleToTurn = Math.PI - Math.Abs(angleToDefenderPosition);
+                multiplier = -1;
             }
             else
             {
-                if (this.self.GetDistanceTo(defenderPosition) < 50)
+                angleToTurn = Math.Abs(angleToDefenderPosition);
+            }
+
+            angleToTurn *= angleToDefenderPosition > 0 ? -1 : 1;
+
+            
+
+            //var speed = this.self.Speed();
+
+
+            //if(distanceToDefenderPosition < 20)
+            //{
+            //    this.move.Turn = this.AngleToPuck;
+            //    if(this.self.Speed() > 1)
+            //    {
+            //        var speedUp = -multiplier;
+            //        this.move.SpeedUp = speedUp;
+            //    }
+            //    else
+            //    {
+            //        this.move.SpeedUp = 0;
+            //    }
+            //}
+            //else
+            //{
+            //    var dist = Math.Pow(speed, 2) / (2 * this.game.HockeyistSpeedUpFactor);
+            //    this.move.Turn = angleToTurn;
+            //    var speedUp = dist > distanceToDefenderPosition ? -multiplier : multiplier;
+            //    this.move.SpeedUp = speedUp;
+            //}
+
+            if(distanceToDefenderPosition == 0)
+            {
+                this.move.Turn = this.AngleToPuck;
+                this.move.SpeedUp = 0;
+            }
+            else if (distanceToDefenderPosition < 15)
+            {
+                this.move.Turn = this.AngleToPuck;
+                this.move.SpeedUp = 0; 
+                if (this.self.Speed() > 1)
                 {
-                    this.move.Turn = this.self.GetAngleTo(defenderPosition);
-                    if(this.self.Speed() < 5)
-                    {
-                        this.move.SpeedUp = 0.1;
-                    }
-                    else
-                    {
-                        this.move.SpeedUp = 0;
-                    }
-                }
-                else if (this.self.GetDistanceTo(defenderPosition) < 100)
-                {
-                    this.move.Turn = this.self.GetAngleTo(defenderPosition);
-                    this.move.SpeedUp = 0.4;
-                }
-                else
-                {
-                    this.SetTurnAndSpeed(self.GetAngleTo(defenderPosition.X, defenderPosition.Y));
+                    this.move.SpeedUp = -1 * multiplier;
                 }
             }
+            else if(distanceToDefenderPosition < 45)
+            {
+                this.move.Turn = this.AngleToPuck;
+                if(this.self.Speed() < 0.1)
+                {
+                    this.move.SpeedUp = 1 * multiplier;
+                }
+            }
+            else if(distanceToDefenderPosition < 60)
+            {
+                this.move.Turn = angleToTurn;
+                this.move.SpeedUp = 0.2 * multiplier;
+            }
+            else
+            {
+                this.move.Turn = angleToTurn;
+                this.move.SpeedUp = 1 * multiplier;
+            }
+
+            //if (this.self.GetDistanceTo(defenderPosition) < 15)
+            //{
+            //    this.move.Turn = this.self.GetAngleTo(this.Puck);
+            //    this.move.SpeedUp = 0;
+            //}
+            //else
+            //{
+            //    if (this.self.GetDistanceTo(defenderPosition) < 50)
+            //    {
+            //        this.move.Turn = this.self.GetAngleTo(defenderPosition);
+            //        if(this.self.Speed() < 5)
+            //        {
+            //            this.move.SpeedUp = 0.1;
+            //        }
+            //        else
+            //        {
+            //            this.move.SpeedUp = 0;
+            //        }
+            //    }
+            //    else if (this.self.GetDistanceTo(defenderPosition) < 100)
+            //    {
+            //        this.move.Turn = this.self.GetAngleTo(defenderPosition);
+            //        this.move.SpeedUp = 0.4;
+            //    }
+            //    else
+            //    {
+            //        this.SetTurnAndSpeed(self.GetAngleTo(defenderPosition.X, defenderPosition.Y));
+            //    }
+            //}
         }
     }
 }

@@ -21,8 +21,8 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public const double NearPointDistance = 100;
 
-        public const double RangeFromGoalieX = 20;
+        public const double RangeFromGoalieX = 30;
 
-        public const double RangeFromGoalieY = 40;
+        public const double RangeFromGoalieY = 60;
     }
 }

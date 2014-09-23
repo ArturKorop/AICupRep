@@ -8,6 +8,14 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 {
     public class AttackerActions : Actions
     {
+        private bool IsInAttackRinkSide
+        {
+            get
+            {
+                return this.self.X.IsBetweenCoord(BestPositionToAttack.X, Manager.OpponentNetCenter.X);
+            }
+        }
+
         public AttackerActions(World world, Game game, Hockeyist self, Move move, CurrentSituation currentSituation)
             : base(world, game, self, move, currentSituation)
         {
@@ -15,7 +23,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public override void FreePuck_SelfNearestToPuckAction()
         {
-            this.SetTurnAndSpeed(this.self.GetAngleTo(this.Puck));
+            this.SetTurnAndSpeed(this.AngleToPuck);
             this.move.Action = ActionType.TakePuck;
         }
 
@@ -26,13 +34,27 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public override void OpponentHavePuck()
         {
-            if(this.self.CanHitPuck(this.world, this.game))
+            if (this.CanHitPuck && this.CanDoAction)
             {
-                this.move.Action = ActionType.Strike;
+                if (this.Puck.ToPoint().IsInOpponentSide())
+                {
+                    this.move.Action = ActionType.TakePuck;
+                }
+                else
+                {
+                    this.move.Action = ActionType.Strike;
+                }
             }
             else
             {
-                this.AttackerWaitPuck();
+                if(this.Puck.ToPoint().IsInOpponentSide())
+                {
+                    this.SetTurnAndSpeed(this.AngleToPuck);
+                }
+                else
+                {
+                    this.AttackerWaitPuck();
+                }
             }
         }
 
@@ -43,42 +65,63 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
         public override void MeHavePuck_SelfHavePuck()
         {
-            var bestAttackerPosition = GetBestPositionToAttack(this.self, this.world);
-
-            if(this.self.GetDistanceTo(bestAttackerPosition) < 100)
+            if(this.IsInAttackRinkSide)
             {
                 var hitPosition = GetBestHitPosition(this.self, this.currentSituation);
-                var angleToHitPosition = this.self.GetAngleTo(hitPosition.X, hitPosition.Y);
+                var angleToHitPosition = this.self.GetAngleTo(hitPosition);
 
-                if(Math.Abs(angleToHitPosition) <= Constants.StrikeAngle)
+                if (Math.Abs(angleToHitPosition) <= Constants.StrikeAngle)
                 {
-                    var nearestOpponent = this.self.NearestOpponentTime(this.world, this.game);
-
-                    if(nearestOpponent.CanHitPuck(this.world,this.game))
+                    if (this.CanDoAction)
                     {
-                        this.Strike();
-                    }
-                    else
-                    {
-                        if(this.self.Speed() > 2)
+                        if (this.NearestOpponent.CanHitPuck(this.world, this.game) && this.NearestOpponent.RemainingCooldownTicks < 10)
                         {
                             this.Strike();
                         }
                         else
                         {
-                            this.Swing();
+                            if (this.self.Speed() > 5)
+                            {
+                                this.Strike();
+                            }
+                            else
+                            {
+                                this.Swing();
+                            }
                         }
+                    }
+                    else
+                    {
+                        this.move.SpeedUp = 0;
                     }
                 }
                 else
                 {
-                    this.move.Turn = angleToHitPosition;
-                    this.move.SpeedUp = 0;
+                    if (Math.Abs(this.self.GetAngleTo(hitPosition)) >= Math.PI / 2 && this.self.GetDistanceTo(this.NearestOpponent) <= 200)
+                    {
+                        var anglesToTeammates = this.world.Teammates(this.self).Select(x => this.self.GetAngleTo(x));
+                        var minAngleToTeammates = anglesToTeammates.Min(x => Math.Abs(x));
+                        var angleToTeammate = anglesToTeammates.First(x => Math.Abs(x) == minAngleToTeammates);
+                        if (minAngleToTeammates <= this.game.PassSector / 2 && this.CanDoAction)
+                        {
+                            this.move.PassAngle = angleToTeammate;
+                            this.move.PassPower = 0.5;
+                            this.move.Action = ActionType.Pass;
+                        }
+                        else
+                        {
+                            this.SetTurnAndSpeed(angleToHitPosition);
+                        }
+                    }
+                    else
+                    {
+                        this.SetTurnAndSpeed(angleToHitPosition);
+                    }
                 }
             }
             else
             {
-                this.SetTurnAndSpeed(this.self.GetAngleTo(bestAttackerPosition.X, bestAttackerPosition.Y));
+                this.SetTurnAndSpeed(this.AngleToBestAttackPosition);
             }
         }
     }

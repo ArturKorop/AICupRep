@@ -57,15 +57,52 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             }
         }
 
+        public static void ChangeAttVsDef(World world, Game game)
+        {
+            var tempId = Manager.AttackerId;
+            Manager.AttackerId = Manager.DefenderId;
+            Manager.DefenderId = tempId;
+
+            var opponent = world.GetOpponentPlayer();
+            var rinkBorderLength = ((game.RinkBottom - game.RinkTop) - game.GoalNetHeight) / 2;
+            var bestTopY = game.RinkTop + rinkBorderLength * 0.4;
+            var bestBottomY = game.RinkBottom - rinkBorderLength * 0.4;
+
+            var rinkLength = game.RinkRight - game.RinkLeft;
+            var bestAttackerRinkLength = (rinkLength / 2) * 1.1;
+            var bestX = 0.0;
+            var bestHitX = 0.0;
+            var retreatX = 0.0;
+            var defenderX = 0.0;
+            if (opponent.NetLeft > 500)
+            {
+                bestX = game.RinkRight - bestAttackerRinkLength;
+                bestHitX = game.RinkRight;
+                retreatX = game.RinkLeft + Constants.RetreatX;
+                defenderX = MyNetCenter.X + Constants.DefenderRangeFromNet;
+            }
+            else
+            {
+                bestX = game.RinkLeft + bestAttackerRinkLength;
+                bestHitX = game.RinkLeft;
+                retreatX = game.RinkRight - Constants.RetreatX;
+                defenderX = MyNetCenter.X - Constants.DefenderRangeFromNet;
+            }
+
+            BestTopStrikePosition = new Point(bestX, bestTopY);
+
+            BestBottomStrikePosition = new Point(bestX, bestBottomY);
+        }
+
         private static void CalculateBestStrikePosition(World world, Game game)
         {
             var opponent = world.GetOpponentPlayer();
             var rinkBorderLength = ((game.RinkBottom - game.RinkTop) - game.GoalNetHeight) / 2;
-            var bestTopY = game.RinkTop;// + rinkBorderLength * 0.5;
-            var bestBottomY = game.RinkBottom;// - rinkBorderLength * 0.5;
+            var bestTopY = game.RinkTop + rinkBorderLength * 0.4;
+            var bestBottomY = game.RinkBottom - rinkBorderLength * 0.4;
 
             var rinkLength = game.RinkRight - game.RinkLeft;
-            var bestAttackerRinkLength = (rinkLength / 2) * 0.8;
+            var bestAttackerRinkLength = (rinkLength / 2) * 0.9;
             var bestX = 0.0;
             var bestHitX = 0.0;
             var retreatX = 0.0;
@@ -120,13 +157,6 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
 
             AttackerId = nearestToPuck.Id;
             DefenderId = farestToPuck.Id;
-        }
-
-        public static void ChangeAttVsDef()
-        {
-            var tempId = Manager.AttackerId;
-            Manager.AttackerId = Manager.DefenderId;
-            Manager.DefenderId = tempId;
         }
 
         private static void InitRetreateList(World world)

@@ -97,7 +97,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
             }
 
             var distanceToNet = self.GetDistanceTo(Manager.OpponentNetCenter.X, Manager.OpponentNetCenter.Y);
-            var bestPosToAttack = Actions.GetBestPositionToAttack(self, world);
+            var bestPosToAttack = Actions.GetBestPositionToAttack(self, world, game);
             var distanceToBestStrikePosition = self.GetDistanceTo(bestPosToAttack.X, bestPosToAttack.Y);
             var distanceBetweenNetAndBestStrikePosition = bestPosToAttack.DistanceTo(Manager.OpponentNetCenter);
 
