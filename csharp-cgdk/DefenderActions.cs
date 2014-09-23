@@ -24,7 +24,7 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                     }
                     else
                     {
-                        if (this.self.GetDistanceTo(this.NearestOpponent) > 300)
+                        if (this.self.GetDistanceTo(this.NearestOpponent) > 240 && this.world.MyGoalie() != null && Math.Abs(this.world.MyGoalie().Y - this.self.Y) < 20)
                         {
                             this.move.Action = ActionType.TakePuck;
                         }
@@ -64,21 +64,22 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         {
             if (this.Puck.ToPoint().IsInMyRinkSide())
             {
-                if (this.self.CanHitPuck(world, game))
+                if (this.self.CanHitPuck(world, game) || this.self.CanHitOpponent(this.world, this.game, this.self.NearestOpponentDistance(this.world)))
                 {
                     this.move.Action = ActionType.Strike;
                 }
                 else
                 {
-                    var distanceToPuck = this.self.GetDistanceTo(this.Puck);
-                    if(distanceToPuck > 200)
-                    {
-                        this.GoToDefenderPosition();
-                    }
-                    else
-                    {
-                        this.SetTurnAndSpeed(this.self.GetAngleTo(this.Puck));
-                    }
+                    //var distanceToPuck = this.self.GetDistanceTo(this.Puck);
+                    //if(distanceToPuck > 200)
+                    //{
+                    //    this.GoToDefenderPosition();
+                    //}
+                    //else
+                    //{
+                    //    this.SetTurnAndSpeed(this.self.GetAngleTo(this.Puck));
+                    //}
+                    this.SetTurnAndSpeed(this.self.GetAngleTo(this.Puck));
                 }
             }
             else

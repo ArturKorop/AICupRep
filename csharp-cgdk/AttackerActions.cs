@@ -67,20 +67,20 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
         {
             if(this.IsInAttackRinkSide)
             {
-                var hitPosition = GetBestHitPosition(this.self, this.currentSituation);
-                var angleToHitPosition = this.self.GetAngleTo(hitPosition);
-
-                if (Math.Abs(angleToHitPosition) <= Constants.StrikeAngle)
+                if (Math.Abs(this.self.X - Manager.OpponentNetCenter.X) <= 200)
                 {
-                    if (this.CanDoAction)
+                    this.SetTurnAndSpeed(this.self.GetAngleTo(Manager.DefenderPosition));
+                }
+                else 
+                {
+                    var hitPosition = GetBestHitPosition(this.self, this.currentSituation);
+                    var angleToHitPosition = this.self.GetAngleTo(hitPosition);
+
+                    if (Math.Abs(angleToHitPosition) <= Constants.StrikeAngle)
                     {
-                        if (this.NearestOpponent.CanHitPuck(this.world, this.game) && this.NearestOpponent.RemainingCooldownTicks < 10)
+                        if (this.CanDoAction)
                         {
-                            this.Strike();
-                        }
-                        else
-                        {
-                            if (this.self.Speed() > 5)
+                            if (this.NearestOpponent.CanHitPuck(this.world, this.game) && this.NearestOpponent.RemainingCooldownTicks < 10)
                             {
                                 this.Strike();
                             }
@@ -89,39 +89,60 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                                 this.Swing();
                             }
                         }
+                        else
+                        {
+                            this.move.SpeedUp = 1;
+                        }
                     }
                     else
                     {
-                        this.move.SpeedUp = 0;
-                    }
-                }
-                else
-                {
-                    if (Math.Abs(this.self.GetAngleTo(hitPosition)) >= Math.PI / 2 && this.self.GetDistanceTo(this.NearestOpponent) <= 200)
-                    {
-                        var anglesToTeammates = this.world.Teammates(this.self).Select(x => this.self.GetAngleTo(x));
-                        var minAngleToTeammates = anglesToTeammates.Min(x => Math.Abs(x));
-                        var angleToTeammate = anglesToTeammates.First(x => Math.Abs(x) == minAngleToTeammates);
-                        if (minAngleToTeammates <= this.game.PassSector / 2 && this.CanDoAction)
+                        if (Math.Abs(this.self.GetAngleTo(hitPosition)) >= Math.PI / 2) //&& this.self.GetDistanceTo(this.NearestOpponent) <= 200)
                         {
-                            this.move.PassAngle = angleToTeammate;
-                            this.move.PassPower = 0.5;
-                            this.move.Action = ActionType.Pass;
+                            var anglesToTeammates = this.world.Teammates(this.self).Select(x => this.self.GetAngleTo(x));
+                            var minAngleToTeammates = anglesToTeammates.Min(x => Math.Abs(x));
+                            var angleToTeammate = anglesToTeammates.First(x => Math.Abs(x) == minAngleToTeammates);
+                            if (minAngleToTeammates <= this.game.PassSector / 2 && this.CanDoAction)
+                            {
+                                this.move.PassAngle = angleToTeammate;
+                                this.move.PassPower = 0.5;
+                                this.move.Action = ActionType.Pass;
+                            }
+                            else
+                            {
+                                this.SetTurnAndSpeed(angleToHitPosition);
+                            }
                         }
                         else
                         {
                             this.SetTurnAndSpeed(angleToHitPosition);
                         }
                     }
-                    else
-                    {
-                        this.SetTurnAndSpeed(angleToHitPosition);
-                    }
                 }
             }
             else
             {
-                this.SetTurnAndSpeed(this.AngleToBestAttackPosition);
+                var minDistToOpponents = this.world.OpponentTeam().Select(x => x.DistanceToSegment(this.self.ToPoint(), this.BestPositionToAttack)).Min();
+
+                if (minDistToOpponents < 200)
+                {
+                    var anglesToTeammates = this.world.Teammates(this.self).Select(x => this.self.GetAngleTo(x));
+                    var minAngleToTeammates = anglesToTeammates.Min(x => Math.Abs(x));
+                    var angleToTeammate = anglesToTeammates.First(x => Math.Abs(x) == minAngleToTeammates);
+                    if (minAngleToTeammates <= this.game.PassSector / 2 && this.CanDoAction)
+                    {
+                        this.move.PassAngle = angleToTeammate;
+                        this.move.PassPower = 0.5;
+                        this.move.Action = ActionType.Pass;
+                    }
+                    else
+                    {
+                        this.SetTurnAndSpeed(this.self.GetAngleTo(Manager.DefenderPosition));
+                    }
+                }
+                else
+                {
+                    this.SetTurnAndSpeed(this.AngleToBestAttackPosition);
+                }
             }
         }
     }

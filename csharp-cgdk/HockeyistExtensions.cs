@@ -54,6 +54,12 @@ namespace Com.CodeGame.CodeHockey2014.DevKit.CSharpCgdk
                     Math.Abs(self.GetAngleTo(puck)) <= game.StickSector / 2;
         }
 
+        public static bool CanHitOpponent(this Hockeyist self, World world, Game game, Hockeyist opponent)
+        {
+            return self.GetDistanceTo(opponent) <= game.StickLength &&
+                    Math.Abs(self.GetAngleTo(opponent)) <= game.StickSector / 2;
+        }
+
         public static bool IsNearPoint(this Hockeyist self, Point point, double nearDistance)
         {
             return self.GetDistanceTo(point) <= nearDistance;
